@@ -1,4 +1,5 @@
 var express = require('express'),
+    cool = require('cool-ascii-faces'),
     router = express.Router(),
     request = require('request'),
     bodyParser = require('body-parser'),
