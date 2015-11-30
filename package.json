@@ -1,7 +1,7 @@
 {
   "name": "di-transceiver",
   "version": "0.0.1",
-  "description": "A transceiver app for the Brightcove Dynamic Ingest API"
+  "description": "A transceiver app for the Brightcove Dynamic Ingest API",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
