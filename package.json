@@ -1,6 +1,7 @@
 {
   "name": "di-transceiver",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "A transceiver app for the Brightcove Dynamic Ingest API"
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
@@ -14,5 +15,14 @@
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0",
     "request": "~2.67.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BrightcoveLearning/di-transceiver"
+  },
+  "keywords": [
+    "Brightcove",
+    "Dynamic-Ingest"
+  ],
+  "license": "MIT"
 }

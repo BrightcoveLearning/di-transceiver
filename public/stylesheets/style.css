@@ -18,3 +18,12 @@ button {
     padding: .5em;
     background-color: #f5f5f5;
 }
+.left {
+    width: 30%;
+    padding: .3em;
+}
+.right {
+    width: 65%;
+    padding: .3em;
+    background-color: #f5f5f5;
+}
