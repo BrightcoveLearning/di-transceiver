@@ -26,7 +26,7 @@ router.use(bodyParser.urlencoded({
 }));
 
 function makeRequest(requestOptions, callback) {
-    console.log("requestOptions", requestOptions);
+    // console.log("requestOptions", requestOptions);
     request(requestOptions, function(error, response, body) {
         // console.log('response', response);
         // console.log("body", body);
@@ -35,16 +35,17 @@ function makeRequest(requestOptions, callback) {
             if (requestType === 'cms') {
                 currentVideoId = responseData.id;
                 requestType = 'di';
+                checkJobCount();
             } else {
                 submittedJobs.push(responseData.id);
                 runningJobCount += 1;
                 requestQueue.splice(0, 1);
                 requestType = 'cms';
+                checkJobCount();
             }
         } else {
             errorLog.push(error);
         }
-        checkJobCount();
     });
 
 }
@@ -173,8 +174,7 @@ router.post('/notifications', function(req, res, next) {
     var notificationData;
 
     var content = '';
-
-    console.log('got notification data');
+    console.log('req', req)
     req.on('data', function(data) {
         // Append data.
         content += data;
@@ -182,6 +182,7 @@ router.post('/notifications', function(req, res, next) {
 
     req.on('end', function() {
         // Assuming, we're receiving JSON, parse the string into a JSON object to return.
+        console.log('got notification data', req.body.status);
         console.log('content', content);
         notificationData = JSON.parse(content);
         console.log('notificationData', notificationData);

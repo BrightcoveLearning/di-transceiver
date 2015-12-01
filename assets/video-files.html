@@ -79,8 +79,7 @@
         <h3>Minified</h3>
         <textarea id="dataMin"></textarea>
         <script>
-        var videos = ["Biking_Modus-CR550.mp4",
-            "Cartoon_BettyBoop.mp4",
+        var videos = ["Cartoon_BettyBoop.mp4",
             "Bird_Chickadee.mp4",
             "Bird_CommonRedpoll.mp4",
             "Bird_Magpie.mp4",
@@ -130,7 +129,7 @@
             function generateData () {
                 for (j = 0; j < numberSets; j += 1) {
                     for (i = 0; i < iMax; i += 1) {
-                        var now = new Date().toISOString();
+                        var now = new Date().valueOf();
                         video = videos[i];
                         videoDataItem = {};
                         videoDataItem.di = {};
