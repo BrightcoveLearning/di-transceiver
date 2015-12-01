@@ -11,7 +11,7 @@ var express = require('express'),
     runningJobCount = 0,
     successCount = 0,
     account_id = '57838016001',
-    callbackURL = 'http://solutions.brightcove.com:3000/notications',
+    callbackURL = 'http://solutions.brightcove.com:5000/notifications',
     cmsURL = '',
     diURL = '',
     options = {
@@ -28,8 +28,8 @@ router.use(bodyParser.urlencoded({
 function makeRequest(requestOptions, callback) {
     console.log("requestOptions", requestOptions);
     request(requestOptions, function(error, response, body) {
-        console.log('response', response);
-        console.log("body", body);
+        // console.log('response', response);
+        // console.log("body", body);
         if (error === null) {
             responseData = JSON.parse(body);
             if (requestType === 'cms') {
@@ -85,9 +85,8 @@ function setUpRequest(callback) {
 
 
 function setRequestOptions(callback) {
-    console.log('setRequestOptions');
-    var requestType = 'cms',
-    currentRequest = requestQueue[0];
+    console.log('requestType', requestType);
+    var currentRequest = requestQueue[0];
     if (requestType === 'cms') {
         options.url = 'https://cms.api.brightcove.com/v1/accounts/' + account_id + '/videos';
         options.requestType = 'POST';
@@ -95,8 +94,8 @@ function setRequestOptions(callback) {
     } else {
         options.url = 'https://ingest.api.brightcove.com/v1/accounts/' + account_id + '/videos/' + currentVideoId + '/ingest-requests';
         options.requestType = 'POST';
+        currentRequest.di.callbacks = [callbackURL];
         options.requestBody = JSON.stringify(currentRequest.di);
-        options.requestBody.callbacks = [callbackURL];
     }
     requestOptions = {
         method: options.requestType,
@@ -145,7 +144,7 @@ function getAccessToken(callback) {
 
 function checkJobCount() {
     console.log('checkJobCount');
-    if (requestQueue.length > 0 && runningJobCount < 101) {
+    if (requestQueue.length > 0 && runningJobCount < 100) {
         setUpRequest();
     }
 }
@@ -175,6 +174,7 @@ router.post('/notifications', function(req, res, next) {
 
     var content = '';
 
+    console.log('got notification data');
     req.on('data', function(data) {
         // Append data.
         content += data;
@@ -182,7 +182,9 @@ router.post('/notifications', function(req, res, next) {
 
     req.on('end', function() {
         // Assuming, we're receiving JSON, parse the string into a JSON object to return.
+        console.log('content', content);
         notificationData = JSON.parse(content);
+        console.log('notificationData', notificationData);
         if (notificationData.status === 'SUCCESS') {
             successCount += 1;
             runningJobCount -= 1;
@@ -190,6 +192,8 @@ router.post('/notifications', function(req, res, next) {
         }
         // console.log('requestData', requestData);
     });
+
+
 
 });
 
