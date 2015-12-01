@@ -1,5 +1,4 @@
 var express = require('express'),
-    cool = require('cool-ascii-faces'),
     router = express.Router(),
     request = require('request'),
     bodyParser = require('body-parser'),
@@ -25,6 +24,10 @@ router.use(bodyParser.urlencoded({
     extended: false
 }));
 
+/**
+ * makes the API requests
+ * @param {Object} requestOptions options for the request
+ */
 function makeRequest(requestOptions, callback) {
     // console.log("requestOptions", requestOptions);
     request(requestOptions, function(error, response, body) {
@@ -51,7 +54,7 @@ function makeRequest(requestOptions, callback) {
 }
 
 /*
- * sends the request to the targeted API
+ * gets an access token if needed and moves the API requests along
  */
 function setUpRequest(callback) {
     console.log('setUpRequest');
@@ -84,7 +87,9 @@ function setUpRequest(callback) {
         }
 }
 
-
+/**
+ * sets the options for the API requests
+ */
 function setRequestOptions(callback) {
     console.log('requestType', requestType);
     var currentRequest = requestQueue[0];
@@ -113,7 +118,7 @@ function setRequestOptions(callback) {
 }
 
 /*
- * get new access_token for other APIs
+ * get new access_token for the API requests
  */
 function getAccessToken(callback) {
     console.log('getAccessToken');
@@ -143,6 +148,10 @@ function getAccessToken(callback) {
     });
 }
 
+/**
+ * checks the running job count and request queue to see if
+ * more jobs can be submitted
+ */
 function checkJobCount() {
     console.log('checkJobCount');
     if (requestQueue.length > 0 && runningJobCount < 100) {
@@ -151,15 +160,14 @@ function checkJobCount() {
 }
 
 
-/* GET home page. */
+/* GET home page. Used to submit ingest requests */
 router.get('/', function(req, res, next) {
     res.render('index', {
-        title: 'Dynamic Ingest Transceiver',
-        runningJobCount: runningJobCount
+        title: 'Dynamic Ingest Transceiver'
     });
 });
 
-/* GET dashboard. */
+/* GET dashboard. Monitors the progress of ingest requests */
 router.get('/dashboard', function(req, res, next) {
     res.render('dashboard', {
         title: 'Dynamic Ingest Transceiver Dashboard',
@@ -169,36 +177,28 @@ router.get('/dashboard', function(req, res, next) {
     });
 });
 
-/* POST notifications. */
+/* POST notifications.
+ * receives notifications from the ingest system
+ * and adjusts the runningJobCount and successCount
+ */
 router.post('/notifications', function(req, res, next) {
     var notificationData;
 
-    var content = '';
-    console.log('req', req)
-    req.on('data', function(data) {
-        // Append data.
-        content += data;
-    });
-
-    req.on('end', function() {
-        // Assuming, we're receiving JSON, parse the string into a JSON object to return.
-        console.log('got notification data', req.body.status);
-        console.log('content', content);
-        notificationData = JSON.parse(content);
-        console.log('notificationData', notificationData);
-        if (notificationData.status === 'SUCCESS') {
+    var content = req.body;
+    console.log('req.body', req.body);
+        if (content.status === 'SUCCESS') {
             successCount += 1;
-            runningJobCount -= 1;
+            if (runningJobCount > 0) {
+                runningJobCount -= 1;
+            } else {
+                runningJobCount = 0;
+            }
+
             checkJobCount();
         }
-        // console.log('requestData', requestData);
-    });
-
-
-
 });
 
-/* POST requests. */
+/* POST requests. Receives ingest requests */
 router.post('/requests', function(req, res, next) {
     var requestData,
         origin = (req.headers.origin || "*"),
